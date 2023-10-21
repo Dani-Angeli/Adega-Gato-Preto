@@ -40,14 +40,14 @@ public class EmployeeService {
         return vo;
     }
 
-    public  EmployeeVO updateEmployee(EmployeeVO employee) {
+    public EmployeeVO updateEmployee(EmployeeVO employee) {
         logger.info("Updating requested Employee!");
 
         var entity = employeeRepository.findById(employee.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("ERROR: No records found for this ID!"));
         entity.setUsername(employee.getUsername());
         entity.setPassword(employee.getPassword());
-        entity.setStatus(employee.getStatus());
+        entity.setRole(employee.getRole());
         entity.setName(employee.getName());
         entity.setCpf(employee.getCpf());
         entity.setEmail(employee.getEmail());

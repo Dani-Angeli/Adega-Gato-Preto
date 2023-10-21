@@ -1,6 +1,8 @@
 package br.com.adegagatopreto.data.vo.v1;
 
 
+import br.com.adegagatopreto.enums.ActiveStatus;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -9,6 +11,8 @@ public class ProductVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Long id;
+    private ActiveStatus status;
+    private Integer barcode;
     private String name;
     private String type;
     private String size;
@@ -19,8 +23,10 @@ public class ProductVO implements Serializable {
     public ProductVO() {
     }
 
-    public ProductVO(Long id, String name, String type, String size, String buyValue, String sellValue, Integer quantity) {
+    public ProductVO(Long id, ActiveStatus status, Integer barcode, String name, String type, String size, String buyValue, String sellValue, Integer quantity) {
         this.id = id;
+        this.status = status;
+        this.barcode = barcode;
         this.name = name;
         this.type = type;
         this.size = size;
@@ -35,6 +41,22 @@ public class ProductVO implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public ActiveStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ActiveStatus status) {
+        this.status = status;
+    }
+
+    public Integer getBarcode() {
+        return barcode;
+    }
+
+    public void setBarcode(Integer barcode) {
+        this.barcode = barcode;
     }
 
     public String getName() {
@@ -88,12 +110,12 @@ public class ProductVO implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ProductVO product)) return false;
-        return Objects.equals(getId(), product.getId()) && Objects.equals(getName(), product.getName()) && Objects.equals(getType(), product.getType()) && Objects.equals(getSize(), product.getSize()) && Objects.equals(getBuyValue(), product.getBuyValue()) && Objects.equals(getSellValue(), product.getSellValue()) && Objects.equals(getQuantity(), product.getQuantity());
+        if (!(o instanceof ProductVO productVO)) return false;
+        return Objects.equals(getId(), productVO.getId()) && getStatus() == productVO.getStatus() && Objects.equals(getBarcode(), productVO.getBarcode()) && Objects.equals(getName(), productVO.getName()) && Objects.equals(getType(), productVO.getType()) && Objects.equals(getSize(), productVO.getSize()) && Objects.equals(getBuyValue(), productVO.getBuyValue()) && Objects.equals(getSellValue(), productVO.getSellValue()) && Objects.equals(getQuantity(), productVO.getQuantity());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getType(), getSize(), getBuyValue(), getSellValue(), getQuantity());
+        return Objects.hash(getId(), getStatus(), getBarcode(), getName(), getType(), getSize(), getBuyValue(), getSellValue(), getQuantity());
     }
 }
