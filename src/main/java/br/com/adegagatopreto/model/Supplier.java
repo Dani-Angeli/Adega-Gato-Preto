@@ -1,5 +1,6 @@
 package br.com.adegagatopreto.model;
 
+import br.com.adegagatopreto.enums.ActiveStatus;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -16,6 +17,9 @@ public class Supplier implements Serializable {
     @Column(nullable = false)
     private Long id;
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ActiveStatus status;
+    @Column(nullable = false)
     private String name;
     @Column(nullable = false)
     private String cnpj;
@@ -31,8 +35,9 @@ public class Supplier implements Serializable {
     public Supplier() {
     }
 
-    public Supplier(Long id, String name, String cnpj, String email, String phone, String cep, String address) {
+    public Supplier(Long id, ActiveStatus status, String name, String cnpj, String email, String phone, String cep, String address) {
         this.id = id;
+        this.status = status;
         this.name = name;
         this.cnpj = cnpj;
         this.email = email;
@@ -47,6 +52,14 @@ public class Supplier implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public ActiveStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ActiveStatus status) {
+        this.status = status;
     }
 
     public String getName() {
@@ -101,13 +114,11 @@ public class Supplier implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Supplier supplier)) return false;
-        return Objects.equals(getId(), supplier.getId()) && Objects.equals(getName(), supplier.getName()) && Objects.equals(getCnpj(),
-                supplier.getCnpj()) && Objects.equals(getEmail(), supplier.getEmail()) && Objects.equals(getPhone(),
-                supplier.getPhone()) && Objects.equals(getCep(), supplier.getCep()) && Objects.equals(getAddress(), supplier.getAddress());
+        return Objects.equals(getId(), supplier.getId()) && getStatus() == supplier.getStatus() && Objects.equals(getName(), supplier.getName()) && Objects.equals(getCnpj(), supplier.getCnpj()) && Objects.equals(getEmail(), supplier.getEmail()) && Objects.equals(getPhone(), supplier.getPhone()) && Objects.equals(getCep(), supplier.getCep()) && Objects.equals(getAddress(), supplier.getAddress());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getCnpj(), getEmail(), getPhone(), getCep(), getAddress());
+        return Objects.hash(getId(), getStatus(), getName(), getCnpj(), getEmail(), getPhone(), getCep(), getAddress());
     }
 }

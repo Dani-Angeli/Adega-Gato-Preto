@@ -1,5 +1,6 @@
 package br.com.adegagatopreto.data.vo.v1;
 
+import br.com.adegagatopreto.enums.ActiveStatus;
 import br.com.adegagatopreto.enums.EmployeeRole;
 
 import java.io.Serializable;
@@ -10,6 +11,7 @@ public class EmployeeVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Long id;
+    private ActiveStatus status;
     private String username;
     private String password;
     private EmployeeRole role;
@@ -23,9 +25,9 @@ public class EmployeeVO implements Serializable {
     public EmployeeVO() {
     }
 
-    public EmployeeVO(Long id, String username, String password, EmployeeRole role, String name, String cpf, String email,
-                      String phone, String cep, String address) {
+    public EmployeeVO(Long id, ActiveStatus status, String username, String password, EmployeeRole role, String name, String cpf, String email, String phone, String cep, String address) {
         this.id = id;
+        this.status = status;
         this.username = username;
         this.password = password;
         this.role = role;
@@ -43,6 +45,14 @@ public class EmployeeVO implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public ActiveStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ActiveStatus status) {
+        this.status = status;
     }
 
     public String getUsername() {
@@ -121,15 +131,11 @@ public class EmployeeVO implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof EmployeeVO that)) return false;
-        return Objects.equals(getId(), that.getId()) && Objects.equals(getUsername(), that.getUsername()) && Objects.equals(getPassword(),
-                that.getPassword()) && getRole() == that.getRole() && Objects.equals(getName(), that.getName()) && Objects.equals(getCpf(),
-                that.getCpf()) && Objects.equals(getEmail(), that.getEmail()) && Objects.equals(getPhone(),
-                that.getPhone()) && Objects.equals(getCep(), that.getCep()) && Objects.equals(getAddress(), that.getAddress());
+        return Objects.equals(getId(), that.getId()) && getStatus() == that.getStatus() && Objects.equals(getUsername(), that.getUsername()) && Objects.equals(getPassword(), that.getPassword()) && getRole() == that.getRole() && Objects.equals(getName(), that.getName()) && Objects.equals(getCpf(), that.getCpf()) && Objects.equals(getEmail(), that.getEmail()) && Objects.equals(getPhone(), that.getPhone()) && Objects.equals(getCep(), that.getCep()) && Objects.equals(getAddress(), that.getAddress());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getUsername(), getPassword(), getRole(), getName(), getCpf(), getEmail(), getPhone(), getCep(),
-                getAddress());
+        return Objects.hash(getId(), getStatus(), getUsername(), getPassword(), getRole(), getName(), getCpf(), getEmail(), getPhone(), getCep(), getAddress());
     }
 }

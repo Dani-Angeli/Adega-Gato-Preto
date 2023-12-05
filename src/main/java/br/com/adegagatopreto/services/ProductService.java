@@ -86,18 +86,16 @@ public class ProductService {
         try {
             var entity = productRepository.findByIdActive(id);
             entity.setStatus(ActiveStatus.INACTIVE);
-
-            var vo = GatoPretoMapper.parseObject(productRepository.save(entity), ProductVO.class);
+            productRepository.save(entity);
         } catch (Exception e){
             throw new ResourceNotFoundException("ERROR: No records found for this ID!");
         }
     }
 
     public Boolean checkExistingProduct(ProductVO product) {
-        var entity = GatoPretoMapper.parseObject(product, Product.class);
-        var entityCheck = productRepository.findByBarcode(entity.getBarcode());
-        if(entityCheck!=null) {
-            if((entityCheck.getStatus().toString().compareTo("INACTIVE")) != 0) {
+        var entity = productRepository.findByBarcode(product.getBarcode());
+        if(entity!=null) {
+            if((entity.getStatus().toString().compareTo("INACTIVE")) != 0) {
                 throw new InvalidRequestException("ERROR: Product already exists!");
             }
             return true;

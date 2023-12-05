@@ -1,5 +1,6 @@
 package br.com.adegagatopreto.data.vo.v1;
 
+import br.com.adegagatopreto.enums.ActiveStatus;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -9,6 +10,7 @@ public class SupplierVO implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private Long id;
+    private ActiveStatus status;
     private String name;
     private String cnpj;
     private String email;
@@ -19,8 +21,9 @@ public class SupplierVO implements Serializable {
     public SupplierVO() {
     }
 
-    public SupplierVO(Long id, String name, String cnpj, String email, String phone, String cep, String address) {
+    public SupplierVO(Long id, ActiveStatus status, String name, String cnpj, String email, String phone, String cep, String address) {
         this.id = id;
+        this.status = status;
         this.name = name;
         this.cnpj = cnpj;
         this.email = email;
@@ -35,6 +38,14 @@ public class SupplierVO implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public ActiveStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ActiveStatus status) {
+        this.status = status;
     }
 
     public String getName() {
@@ -88,14 +99,12 @@ public class SupplierVO implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof SupplierVO supplier)) return false;
-        return Objects.equals(getId(), supplier.getId()) && Objects.equals(getName(), supplier.getName()) && Objects.equals(getCnpj(),
-                supplier.getCnpj()) && Objects.equals(getEmail(), supplier.getEmail()) && Objects.equals(getPhone(),
-                supplier.getPhone()) && Objects.equals(getCep(), supplier.getCep()) && Objects.equals(getAddress(), supplier.getAddress());
+        if (!(o instanceof SupplierVO that)) return false;
+        return Objects.equals(getId(), that.getId()) && getStatus() == that.getStatus() && Objects.equals(getName(), that.getName()) && Objects.equals(getCnpj(), that.getCnpj()) && Objects.equals(getEmail(), that.getEmail()) && Objects.equals(getPhone(), that.getPhone()) && Objects.equals(getCep(), that.getCep()) && Objects.equals(getAddress(), that.getAddress());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getCnpj(), getEmail(), getPhone(), getCep(), getAddress());
+        return Objects.hash(getId(), getStatus(), getName(), getCnpj(), getEmail(), getPhone(), getCep(), getAddress());
     }
 }
