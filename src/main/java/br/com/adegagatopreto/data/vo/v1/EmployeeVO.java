@@ -1,7 +1,7 @@
 package br.com.adegagatopreto.data.vo.v1;
 
-import br.com.adegagatopreto.enums.EmployeeStatus;
-import jakarta.persistence.*;
+import br.com.adegagatopreto.enums.ActiveStatus;
+import br.com.adegagatopreto.enums.EmployeeRole;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -11,9 +11,10 @@ public class EmployeeVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Long id;
+    private ActiveStatus status;
     private String username;
     private String password;
-    private EmployeeStatus status;
+    private EmployeeRole role;
     private String name;
     private String cpf;
     private String email;
@@ -24,12 +25,12 @@ public class EmployeeVO implements Serializable {
     public EmployeeVO() {
     }
 
-    public EmployeeVO(Long id, String username, String password, EmployeeStatus status, String name, String cpf, String email,
-                      String phone, String cep, String address) {
+    public EmployeeVO(Long id, ActiveStatus status, String username, String password, EmployeeRole role, String name, String cpf, String email, String phone, String cep, String address) {
         this.id = id;
+        this.status = status;
         this.username = username;
         this.password = password;
-        this.status = status;
+        this.role = role;
         this.name = name;
         this.cpf = cpf;
         this.email = email;
@@ -44,6 +45,14 @@ public class EmployeeVO implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public ActiveStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ActiveStatus status) {
+        this.status = status;
     }
 
     public String getUsername() {
@@ -62,12 +71,12 @@ public class EmployeeVO implements Serializable {
         this.password = password;
     }
 
-    public EmployeeStatus getStatus() {
-        return status;
+    public EmployeeRole getRole() {
+        return role;
     }
 
-    public void setStatus(EmployeeStatus status) {
-        this.status = status;
+    public void setRole(EmployeeRole role) {
+        this.role = role;
     }
 
     public String getName() {
@@ -121,18 +130,12 @@ public class EmployeeVO implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof EmployeeVO employee)) return false;
-        return Objects.equals(getId(), employee.getId()) && Objects.equals(getUsername(),
-                employee.getUsername()) && Objects.equals(getPassword(),
-                employee.getPassword()) && getStatus() == employee.getStatus() && Objects.equals(getName(),
-                employee.getName()) && Objects.equals(getCpf(), employee.getCpf()) && Objects.equals(getEmail(),
-                employee.getEmail()) && Objects.equals(getPhone(), employee.getPhone()) && Objects.equals(getCep(),
-                employee.getCep()) && Objects.equals(getAddress(), employee.getAddress());
+        if (!(o instanceof EmployeeVO that)) return false;
+        return Objects.equals(getId(), that.getId()) && getStatus() == that.getStatus() && Objects.equals(getUsername(), that.getUsername()) && Objects.equals(getPassword(), that.getPassword()) && getRole() == that.getRole() && Objects.equals(getName(), that.getName()) && Objects.equals(getCpf(), that.getCpf()) && Objects.equals(getEmail(), that.getEmail()) && Objects.equals(getPhone(), that.getPhone()) && Objects.equals(getCep(), that.getCep()) && Objects.equals(getAddress(), that.getAddress());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getUsername(), getPassword(), getStatus(), getName(), getCpf(), getEmail(), getPhone(),
-                getCep(), getAddress());
+        return Objects.hash(getId(), getStatus(), getUsername(), getPassword(), getRole(), getName(), getCpf(), getEmail(), getPhone(), getCep(), getAddress());
     }
 }

@@ -1,5 +1,6 @@
 package br.com.adegagatopreto.model;
 
+import br.com.adegagatopreto.enums.ActiveStatus;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -14,7 +15,9 @@ public class Client implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ActiveStatus status;
     @Column(nullable = false)
     private String name;
     @Column(nullable = false)
@@ -28,12 +31,34 @@ public class Client implements Serializable {
     @Column(nullable = false)
     private String address;
 
+    public Client() {
+    }
+
+    public Client(Long id, ActiveStatus status, String name, String cpf, String email, String phone, String cep, String address) {
+        this.id = id;
+        this.status = status;
+        this.name = name;
+        this.cpf = cpf;
+        this.email = email;
+        this.phone = phone;
+        this.cep = cep;
+        this.address = address;
+    }
+
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public ActiveStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ActiveStatus status) {
+        this.status = status;
     }
 
     public String getName() {
@@ -84,30 +109,15 @@ public class Client implements Serializable {
         this.address = address;
     }
 
-    public Client() {
-    }
-
-    public Client(Long id, String name, String cpf, String email, String phone, String cep, String address) {
-        this.id = id;
-        this.name = name;
-        this.cpf = cpf;
-        this.email = email;
-        this.phone = phone;
-        this.cep = cep;
-        this.address = address;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Client client)) return false;
-        return Objects.equals(getId(), client.getId()) && Objects.equals(getName(), client.getName()) && Objects.equals(getCpf(),
-                client.getCpf()) && Objects.equals(getEmail(), client.getEmail()) && Objects.equals(getPhone(),
-                client.getPhone()) && Objects.equals(getCep(), client.getCep()) && Objects.equals(getAddress(), client.getAddress());
+        return Objects.equals(getId(), client.getId()) && getStatus() == client.getStatus() && Objects.equals(getName(), client.getName()) && Objects.equals(getCpf(), client.getCpf()) && Objects.equals(getEmail(), client.getEmail()) && Objects.equals(getPhone(), client.getPhone()) && Objects.equals(getCep(), client.getCep()) && Objects.equals(getAddress(), client.getAddress());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getCpf(), getEmail(), getPhone(), getCep(), getAddress());
+        return Objects.hash(getId(), getStatus(), getName(), getCpf(), getEmail(), getPhone(), getCep(), getAddress());
     }
 }

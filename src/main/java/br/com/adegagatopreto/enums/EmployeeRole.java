@@ -1,6 +1,6 @@
 package br.com.adegagatopreto.enums;
 
-public enum EmployeeStatus {
+public enum EmployeeRole {
     USER,
     ADMIN,
     OWNER;

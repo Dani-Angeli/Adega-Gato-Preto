@@ -1,6 +1,8 @@
 package br.com.adegagatopreto.model;
 
+import br.com.adegagatopreto.enums.ActiveStatus;
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -14,6 +16,11 @@ public class Product implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ActiveStatus status;
+    @Column(nullable = false)
+    private String barcode;
     @Column(nullable = false)
     private String name;
     @Column(nullable = false)
@@ -30,8 +37,10 @@ public class Product implements Serializable {
     public Product() {
     }
 
-    public Product(Long id, String name, String type, String size, String buyValue, String sellValue, Integer quantity) {
+    public Product(Long id, ActiveStatus status, String barcode, String name, String type, String size, String buyValue, String sellValue, Integer quantity) {
         this.id = id;
+        this.status = status;
+        this.barcode = barcode;
         this.name = name;
         this.type = type;
         this.size = size;
@@ -46,6 +55,22 @@ public class Product implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public ActiveStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ActiveStatus status) {
+        this.status = status;
+    }
+
+    public String getBarcode() {
+        return barcode;
+    }
+
+    public void setBarcode(String barcode) {
+        this.barcode = barcode;
     }
 
     public String getName() {
@@ -100,11 +125,11 @@ public class Product implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Product product)) return false;
-        return Objects.equals(getId(), product.getId()) && Objects.equals(getName(), product.getName()) && Objects.equals(getType(), product.getType()) && Objects.equals(getSize(), product.getSize()) && Objects.equals(getBuyValue(), product.getBuyValue()) && Objects.equals(getSellValue(), product.getSellValue()) && Objects.equals(getQuantity(), product.getQuantity());
+        return Objects.equals(getId(), product.getId()) && getStatus() == product.getStatus() && Objects.equals(getBarcode(), product.getBarcode()) && Objects.equals(getName(), product.getName()) && Objects.equals(getType(), product.getType()) && Objects.equals(getSize(), product.getSize()) && Objects.equals(getBuyValue(), product.getBuyValue()) && Objects.equals(getSellValue(), product.getSellValue()) && Objects.equals(getQuantity(), product.getQuantity());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getType(), getSize(), getBuyValue(), getSellValue(), getQuantity());
+        return Objects.hash(getId(), getStatus(), getBarcode(), getName(), getType(), getSize(), getBuyValue(), getSellValue(), getQuantity());
     }
 }

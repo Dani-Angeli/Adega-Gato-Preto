@@ -1,6 +1,7 @@
 package br.com.adegagatopreto.model;
 
-import br.com.adegagatopreto.enums.EmployeeStatus;
+import br.com.adegagatopreto.enums.ActiveStatus;
+import br.com.adegagatopreto.enums.EmployeeRole;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -16,11 +17,15 @@ public class Employee implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ActiveStatus status;
+    @Column(nullable = false)
     private String username;
     @Column(nullable = false)
     private String password;
     @Column(nullable = false)
-    private EmployeeStatus status;
+    @Enumerated(EnumType.STRING)
+    private EmployeeRole role;
     @Column(nullable = false)
     private String name;
     @Column(nullable = false)
@@ -37,12 +42,12 @@ public class Employee implements Serializable {
     public Employee() {
     }
 
-    public Employee(Long id, String username, String password, EmployeeStatus status, String name, String cpf, String email,
-                    String phone, String cep, String address) {
+    public Employee(Long id, ActiveStatus status, String username, String password, EmployeeRole role, String name, String cpf, String email, String phone, String cep, String address) {
         this.id = id;
+        this.status = status;
         this.username = username;
         this.password = password;
-        this.status = status;
+        this.role = role;
         this.name = name;
         this.cpf = cpf;
         this.email = email;
@@ -57,6 +62,14 @@ public class Employee implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public ActiveStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ActiveStatus status) {
+        this.status = status;
     }
 
     public String getUsername() {
@@ -75,12 +88,12 @@ public class Employee implements Serializable {
         this.password = password;
     }
 
-    public EmployeeStatus getStatus() {
-        return status;
+    public EmployeeRole getRole() {
+        return role;
     }
 
-    public void setStatus(EmployeeStatus status) {
-        this.status = status;
+    public void setRole(EmployeeRole role) {
+        this.role = role;
     }
 
     public String getName() {
@@ -135,17 +148,11 @@ public class Employee implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Employee employee)) return false;
-        return Objects.equals(getId(), employee.getId()) && Objects.equals(getUsername(),
-                employee.getUsername()) && Objects.equals(getPassword(),
-                employee.getPassword()) && getStatus() == employee.getStatus() && Objects.equals(getName(),
-                employee.getName()) && Objects.equals(getCpf(), employee.getCpf()) && Objects.equals(getEmail(),
-                employee.getEmail()) && Objects.equals(getPhone(), employee.getPhone()) && Objects.equals(getCep(),
-                employee.getCep()) && Objects.equals(getAddress(), employee.getAddress());
+        return Objects.equals(getId(), employee.getId()) && getStatus() == employee.getStatus() && Objects.equals(getUsername(), employee.getUsername()) && Objects.equals(getPassword(), employee.getPassword()) && getRole() == employee.getRole() && Objects.equals(getName(), employee.getName()) && Objects.equals(getCpf(), employee.getCpf()) && Objects.equals(getEmail(), employee.getEmail()) && Objects.equals(getPhone(), employee.getPhone()) && Objects.equals(getCep(), employee.getCep()) && Objects.equals(getAddress(), employee.getAddress());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getUsername(), getPassword(), getStatus(), getName(), getCpf(), getEmail(), getPhone(),
-                getCep(), getAddress());
+        return Objects.hash(getId(), getStatus(), getUsername(), getPassword(), getRole(), getName(), getCpf(), getEmail(), getPhone(), getCep(), getAddress());
     }
 }
