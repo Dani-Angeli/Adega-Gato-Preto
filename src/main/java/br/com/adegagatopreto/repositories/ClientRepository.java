@@ -14,9 +14,6 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
     @Query(value = "SELECT * FROM adega_gato_preto.client WHERE client.id = ? AND client.status = 'ACTIVE'", nativeQuery = true)
     Client findByIdActive(Long id);
 
-
-    Client findClientById(Long id);
-
     @Query(value = "SELECT * FROM adega_gato_preto.client WHERE client.cpf = ?", nativeQuery = true)
     Client findByCpf(String cpf);
 

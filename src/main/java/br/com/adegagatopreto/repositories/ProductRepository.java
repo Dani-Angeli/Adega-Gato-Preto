@@ -1,5 +1,6 @@
 package br.com.adegagatopreto.repositories;
 
+import br.com.adegagatopreto.model.Client;
 import br.com.adegagatopreto.model.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -14,6 +15,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Product findByIdActive(Long id);
 
     @Query(value = "SELECT * FROM adega_gato_preto.product WHERE product.barcode = ?", nativeQuery = true)
-    Product findByBarcode(Integer barcode);
+    Product findByBarcode(String barcode);
 
+    @Query(value = "SELECT * FROM adega_gato_preto.product WHERE product.cpf = ? AND client.status = 'ACTIVE'", nativeQuery = true)
+    Client findByBarcodeActive(String barcode);
+
+    boolean existsProductById(Long id);
+    boolean existsProductByBarcode(String barcode);
 }

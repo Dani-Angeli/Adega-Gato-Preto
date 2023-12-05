@@ -20,7 +20,7 @@ public class Product implements Serializable {
     @Enumerated(EnumType.STRING)
     private ActiveStatus status;
     @Column(nullable = false)
-    private Integer barcode;
+    private String barcode;
     @Column(nullable = false)
     private String name;
     @Column(nullable = false)
@@ -37,7 +37,7 @@ public class Product implements Serializable {
     public Product() {
     }
 
-    public Product(Long id, ActiveStatus status, Integer barcode, String name, String type, String size, String buyValue, String sellValue, Integer quantity) {
+    public Product(Long id, ActiveStatus status, String barcode, String name, String type, String size, String buyValue, String sellValue, Integer quantity) {
         this.id = id;
         this.status = status;
         this.barcode = barcode;
@@ -65,11 +65,11 @@ public class Product implements Serializable {
         this.status = status;
     }
 
-    public Integer getBarcode() {
+    public String getBarcode() {
         return barcode;
     }
 
-    public void setBarcode(Integer barcode) {
+    public void setBarcode(String barcode) {
         this.barcode = barcode;
     }
 

@@ -41,47 +41,24 @@ public class EmployeeService {
     public EmployeeVO createEmployee(EmployeeVO employee) {
         logger.info("Creating an Employee!");
 
-        if(checkExistingEmployee(employee)) {
-            var entity = employeeRepository.findByCpf(employee.getCpf());
-            entity.setStatus(ActiveStatus.ACTIVE);
-            entity.setUsername(employee.getUsername());
-            entity.setPassword(employee.getPassword());
-            entity.setRole(employee.getRole());
-            entity.setName(employee.getName());
-            entity.setEmail(employee.getEmail());
-            entity.setPhone(employee.getPhone());
-            entity.setCep(employee.getCep());
-            entity.setAddress(employee.getAddress());
-            var vo = GatoPretoMapper.parseObject(employeeRepository.save(entity), EmployeeVO.class);
-            return vo;
-        }else {
-            var entity = GatoPretoMapper.parseObject(employee, Employee.class);
-            entity.setStatus(ActiveStatus.ACTIVE);
-            var vo = GatoPretoMapper.parseObject(employeeRepository.save(entity), EmployeeVO.class);
-            return vo;
+        if (employeeRepository.existsEmployeeByUsername(employee.getUsername())) {
+            return validateInactiveExistingUsername(employee);
+        } else if (employeeRepository.existsEmployeeByCpf(employee.getCpf())) {
+            return validateInactiveExistingCPF(employee);
+        } else if (employeeRepository.existsEmployeeByEmail(employee.getEmail())) {
+            return validateInactiveExistingEmail(employee);
+        } else {
+            return createNewEmployee(employee);
         }
     }
 
     public EmployeeVO updateEmployee(EmployeeVO employee) {
         logger.info("Updating requested Employee!");
 
-        try {
-            var entity = employeeRepository.findByIdActive(employee.getId());
-            entity.setUsername(employee.getUsername());
-            entity.setPassword(employee.getPassword());
-            entity.setRole(employee.getRole());
-            entity.setName(employee.getName());
-            entity.setCpf(employee.getCpf());
-            entity.setEmail(employee.getEmail());
-            entity.setPhone(employee.getPhone());
-            entity.setCep(employee.getCep());
-            entity.setAddress(employee.getAddress());
+        var entity = validateActiveId(employee.getId());
+        validateUniqueEmployee(employee, entity);
 
-            var vo = GatoPretoMapper.parseObject(employeeRepository.save(entity), EmployeeVO.class);
-            return vo;
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("ERROR: No records found for this ID!");
-        }
+        return activateAndUpdateEmployee(entity, employee);
     }
 
     public void deleteEmployee(Long id) {
@@ -96,13 +73,159 @@ public class EmployeeService {
         }
     }
 
-    public Boolean checkExistingEmployee(EmployeeVO employee) {
+    private EmployeeVO validateInactiveExistingCPF(EmployeeVO employee) {
         var entity = employeeRepository.findByCpf(employee.getCpf());
-        if(entity != null) {
-            if((entity.getStatus().toString().compareTo("INACTIVE")) != 0) {
-                throw new InvalidRequestException("ERROR: Employee already exists!");
-            }
-            return true;
-        } return false;
+
+        if (entity.getStatus() == ActiveStatus.INACTIVE) {
+            return inactiveCpfHandler(entity, employee);
+        } else {
+            throw new InvalidRequestException("ERROR: This CPF is already registered!");
+        }
     }
+
+    private EmployeeVO inactiveCpfHandler(Employee entity, EmployeeVO employee) {
+        if (employeeRepository.existsEmployeeByEmail(employee.getEmail())) {
+            return validateExistingEmailForInactiveCpf(entity, employee);
+        } else if(employeeRepository.existsEmployeeByUsername(employee.getUsername())) {
+            return validateExistingUsernameForInactiveCpf(entity, employee);
+        }
+        else {
+            return activateAndUpdateEmployee(entity, employee);
+        }
+    }
+
+    private EmployeeVO validateExistingEmailForInactiveCpf(Employee entity, EmployeeVO employee) {
+        var checkEmail = employeeRepository.findByEmail(employee.getEmail());
+
+        if (entity.getId() != checkEmail.getId()) {
+            throw new InvalidRequestException("ERROR: This E-mail is already registered!");
+        } else {
+            return activateAndUpdateEmployee(entity, employee);
+        }
+    }
+
+    private EmployeeVO validateExistingUsernameForInactiveCpf(Employee entity, EmployeeVO employee) {
+        var checkUsername = employeeRepository.findByUsername(employee.getUsername());
+
+        if (entity.getId() != checkUsername.getId()) {
+            throw new InvalidRequestException("ERROR: This Username is already registered!");
+        } else {
+            return activateAndUpdateEmployee(entity, employee);
+        }
+    }
+
+    private EmployeeVO validateInactiveExistingEmail(EmployeeVO employee) {
+        var entity = employeeRepository.findByEmail(employee.getEmail());
+
+        if (entity.getStatus() == ActiveStatus.INACTIVE) {
+            return inactiveEmailHandler(entity, employee);
+        } else {
+            throw new InvalidRequestException("ERROR: This E-mail is already registered!");
+        }
+    }
+
+    private EmployeeVO inactiveEmailHandler(Employee entity, EmployeeVO employee) {
+        if (employeeRepository.existsEmployeeByCpf(employee.getCpf())) {
+            return validateExistingCpfForInactiveEmail(entity, employee);
+        } else if(employeeRepository.existsEmployeeByUsername(employee.getUsername())) {
+            return validateExistingUsernameForInactiveCpf(entity, employee);
+        } else {
+            return activateAndUpdateEmployee(entity, employee);
+        }
+    }
+
+    private EmployeeVO validateExistingCpfForInactiveEmail(Employee entity, EmployeeVO employee) {
+        var checkCpf = employeeRepository.findByCpf(employee.getCpf());
+
+        if (entity.getId() != checkCpf.getId()) {
+            throw new InvalidRequestException("ERROR: This CPF is already registered!");
+        } else {
+            return activateAndUpdateEmployee(entity, employee);
+        }
+    }
+
+    private EmployeeVO validateInactiveExistingUsername(EmployeeVO employee) {
+        var entity = employeeRepository.findByUsername(employee.getUsername());
+
+        if (entity.getStatus() == ActiveStatus.INACTIVE) {
+            return inactiveUsernameHandler(entity, employee);
+        } else {
+            throw new InvalidRequestException("ERROR: This Username is already registered!");
+        }
+    }
+
+    private EmployeeVO inactiveUsernameHandler(Employee entity, EmployeeVO employee) {
+        if (employeeRepository.existsEmployeeByCpf(employee.getCpf())) {
+            return validateExistingCpfForInactiveEmail(entity, employee);
+        } else if(employeeRepository.existsEmployeeByEmail(employee.getEmail())) {
+            return validateExistingEmailForInactiveCpf(entity, employee);
+        } else {
+            return activateAndUpdateEmployee(entity, employee);
+        }
+    }
+
+    private EmployeeVO activateAndUpdateEmployee(Employee entity, EmployeeVO employee) {
+        entity.setStatus(ActiveStatus.ACTIVE);
+        entity.setUsername(employee.getUsername());
+        entity.setPassword(employee.getPassword());
+        entity.setRole(employee.getRole());
+        entity.setName(employee.getName());
+        entity.setCpf(employee.getCpf());
+        entity.setEmail(employee.getEmail());
+        entity.setPhone(employee.getPhone());
+        entity.setCep(employee.getCep());
+        entity.setAddress(employee.getAddress());
+        var vo = GatoPretoMapper.parseObject(employeeRepository.save(entity), EmployeeVO.class);
+        return vo;
+    }
+
+    private EmployeeVO createNewEmployee(EmployeeVO employee) {
+        var entity = GatoPretoMapper.parseObject(employee, Employee.class);
+        entity.setStatus(ActiveStatus.ACTIVE);
+
+        var vo = GatoPretoMapper.parseObject(employeeRepository.save(entity), EmployeeVO.class);
+        return vo;
+    }
+
+    private Employee validateActiveId(Long id) {
+        var entity = employeeRepository.findByIdActive(id);
+        if (entity == null) {
+            throw new ResourceNotFoundException("ERROR: No records found for this ID!");
+        }
+        return entity;
+    }
+
+    private void validateUniqueEmployee(EmployeeVO employee, Employee entity) {
+        if (employeeRepository.existsEmployeeByUsername(employee.getUsername())) {
+            validateUniqueUsername(employee, entity);
+        }
+        if (employeeRepository.existsEmployeeByCpf(employee.getCpf())) {
+            validateUniqueCpf(employee, entity);
+        }
+        if (employeeRepository.existsEmployeeByEmail(employee.getEmail())) {
+            validateUniqueEmail(employee, entity);
+        }
+    }
+
+    private void validateUniqueUsername(EmployeeVO employee, Employee entity) {
+        var checkUsername = employeeRepository.findByUsername(employee.getUsername());
+        if (!entity.getId().equals(checkUsername.getId())) {
+            throw new InvalidRequestException("ERROR: This Username is already registered!");
+        }
+    }
+
+    private void validateUniqueCpf(EmployeeVO employee, Employee entity) {
+        var checkCpf = employeeRepository.findByCpf(employee.getCpf());
+        if (!entity.getId().equals(checkCpf.getId())) {
+            throw new InvalidRequestException("ERROR: This CPF is already registered!");
+        }
+    }
+
+    private void validateUniqueEmail(EmployeeVO employee, Employee entity) {
+        var checkEmail = employeeRepository.findByEmail(employee.getEmail());
+        if (!entity.getId().equals(checkEmail.getId())) {
+            throw new InvalidRequestException("ERROR: This E-mail is already registered!");
+        }
+    }
+
 }

@@ -12,7 +12,7 @@ public class ProductVO implements Serializable {
 
     private Long id;
     private ActiveStatus status;
-    private Integer barcode;
+    private String barcode;
     private String name;
     private String type;
     private String size;
@@ -23,7 +23,7 @@ public class ProductVO implements Serializable {
     public ProductVO() {
     }
 
-    public ProductVO(Long id, ActiveStatus status, Integer barcode, String name, String type, String size, String buyValue, String sellValue, Integer quantity) {
+    public ProductVO(Long id, ActiveStatus status, String barcode, String name, String type, String size, String buyValue, String sellValue, Integer quantity) {
         this.id = id;
         this.status = status;
         this.barcode = barcode;
@@ -51,11 +51,11 @@ public class ProductVO implements Serializable {
         this.status = status;
     }
 
-    public Integer getBarcode() {
+    public String getBarcode() {
         return barcode;
     }
 
-    public void setBarcode(Integer barcode) {
+    public void setBarcode(String barcode) {
         this.barcode = barcode;
     }
 
