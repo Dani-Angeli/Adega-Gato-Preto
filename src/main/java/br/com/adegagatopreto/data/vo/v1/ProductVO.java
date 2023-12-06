@@ -16,14 +16,14 @@ public class ProductVO implements Serializable {
     private String name;
     private String type;
     private String size;
-    private String buyValue;
-    private String sellValue;
+    private Double buyValue;
+    private Double sellValue;
     private Integer quantity;
 
     public ProductVO() {
     }
 
-    public ProductVO(Long id, ActiveStatus status, String barcode, String name, String type, String size, String buyValue, String sellValue, Integer quantity) {
+    public ProductVO(Long id, ActiveStatus status, String barcode, String name, String type, String size, Double buyValue, Double sellValue, Integer quantity) {
         this.id = id;
         this.status = status;
         this.barcode = barcode;
@@ -83,19 +83,19 @@ public class ProductVO implements Serializable {
         this.size = size;
     }
 
-    public String getBuyValue() {
+    public Double getBuyValue() {
         return buyValue;
     }
 
-    public void setBuyValue(String buyValue) {
+    public void setBuyValue(Double buyValue) {
         this.buyValue = buyValue;
     }
 
-    public String getSellValue() {
+    public Double getSellValue() {
         return sellValue;
     }
 
-    public void setSellValue(String sellValue) {
+    public void setSellValue(Double sellValue) {
         this.sellValue = sellValue;
     }
 
