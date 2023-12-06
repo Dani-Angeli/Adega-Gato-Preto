@@ -28,16 +28,16 @@ public class Product implements Serializable {
     @Column(nullable = false)
     private String size;
     @Column(nullable = false)
-    private String buyValue;
+    private Double buyValue;
     @Column(nullable = false)
-    private String sellValue;
+    private Double sellValue;
     @Column(nullable = false)
     private Integer quantity;
 
     public Product() {
     }
 
-    public Product(Long id, ActiveStatus status, String barcode, String name, String type, String size, String buyValue, String sellValue, Integer quantity) {
+    public Product(Long id, ActiveStatus status, String barcode, String name, String type, String size, Double buyValue, Double sellValue, Integer quantity) {
         this.id = id;
         this.status = status;
         this.barcode = barcode;
@@ -97,19 +97,19 @@ public class Product implements Serializable {
         this.size = size;
     }
 
-    public String getBuyValue() {
+    public Double getBuyValue() {
         return buyValue;
     }
 
-    public void setBuyValue(String buyValue) {
+    public void setBuyValue(Double buyValue) {
         this.buyValue = buyValue;
     }
 
-    public String getSellValue() {
+    public Double getSellValue() {
         return sellValue;
     }
 
-    public void setSellValue(String sellValue) {
+    public void setSellValue(Double sellValue) {
         this.sellValue = sellValue;
     }
 
