@@ -2,6 +2,7 @@ package br.com.adegagatopreto.model;
 
 import br.com.adegagatopreto.enums.ActiveStatus;
 import br.com.adegagatopreto.enums.EmployeeRole;
+import br.com.adegagatopreto.enums.UserType;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -9,7 +10,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "employee")
-public class Employee implements Serializable {
+public class Employee extends User implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -20,18 +21,12 @@ public class Employee implements Serializable {
     @Enumerated(EnumType.STRING)
     private ActiveStatus status;
     @Column(nullable = false)
-    private String username;
-    @Column(nullable = false)
-    private String password;
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private EmployeeRole role;
     @Column(nullable = false)
     private String name;
     @Column(nullable = false)
     private String cpf;
-    @Column(nullable = false)
-    private String email;
     @Column(nullable = false)
     private String phone;
     @Column(nullable = false)
@@ -42,15 +37,13 @@ public class Employee implements Serializable {
     public Employee() {
     }
 
-    public Employee(Long id, ActiveStatus status, String username, String password, EmployeeRole role, String name, String cpf, String email, String phone, String cep, String address) {
+    public Employee(String email, String password, UserType type, Long id, ActiveStatus status, EmployeeRole role, String name, String cpf, String phone, String cep, String address) {
+        super(email, password, type);
         this.id = id;
         this.status = status;
-        this.username = username;
-        this.password = password;
         this.role = role;
         this.name = name;
         this.cpf = cpf;
-        this.email = email;
         this.phone = phone;
         this.cep = cep;
         this.address = address;
@@ -70,22 +63,6 @@ public class Employee implements Serializable {
 
     public void setStatus(ActiveStatus status) {
         this.status = status;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public EmployeeRole getRole() {
@@ -110,14 +87,6 @@ public class Employee implements Serializable {
 
     public void setCpf(String cpf) {
         this.cpf = cpf;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getPhone() {
@@ -148,11 +117,12 @@ public class Employee implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Employee employee)) return false;
-        return Objects.equals(getId(), employee.getId()) && getStatus() == employee.getStatus() && Objects.equals(getUsername(), employee.getUsername()) && Objects.equals(getPassword(), employee.getPassword()) && getRole() == employee.getRole() && Objects.equals(getName(), employee.getName()) && Objects.equals(getCpf(), employee.getCpf()) && Objects.equals(getEmail(), employee.getEmail()) && Objects.equals(getPhone(), employee.getPhone()) && Objects.equals(getCep(), employee.getCep()) && Objects.equals(getAddress(), employee.getAddress());
+        if (!super.equals(o)) return false;
+        return Objects.equals(getId(), employee.getId()) && getStatus() == employee.getStatus() && getRole() == employee.getRole() && Objects.equals(getName(), employee.getName()) && Objects.equals(getCpf(), employee.getCpf()) && Objects.equals(getPhone(), employee.getPhone()) && Objects.equals(getCep(), employee.getCep()) && Objects.equals(getAddress(), employee.getAddress());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getStatus(), getUsername(), getPassword(), getRole(), getName(), getCpf(), getEmail(), getPhone(), getCep(), getAddress());
+        return Objects.hash(super.hashCode(), getId(), getStatus(), getRole(), getName(), getCpf(), getPhone(), getCep(), getAddress());
     }
 }

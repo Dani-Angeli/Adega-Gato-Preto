@@ -2,11 +2,13 @@ package br.com.adegagatopreto.services;
 
 import br.com.adegagatopreto.data.vo.v1.ClientVO;
 import br.com.adegagatopreto.enums.ActiveStatus;
+import br.com.adegagatopreto.enums.UserType;
 import br.com.adegagatopreto.exceptions.InvalidRequestException;
 import br.com.adegagatopreto.exceptions.ResourceNotFoundException;
 import br.com.adegagatopreto.mapper.GatoPretoMapper;
 import br.com.adegagatopreto.model.Client;
 import br.com.adegagatopreto.repositories.ClientRepository;
+import br.com.adegagatopreto.repositories.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,8 @@ public class ClientService {
 
     @Autowired
     ClientRepository clientRepository;
+    @Autowired
+    EmployeeRepository employeeRepository;
 
     public List<ClientVO> findAll() {
         logger.info("Finding all Clients!");
@@ -43,7 +47,7 @@ public class ClientService {
 
         if (clientRepository.existsClientByCpf(client.getCpf())) {
             return validateInactiveExistingCPF(client);
-        } else if (clientRepository.existsClientByEmail(client.getEmail())) {
+        } else if (clientRepository.existsClientByEmail(client.getEmail()) || employeeRepository.existsEmployeeByEmail(client.getEmail())) {
             return validateInactiveExistingEmail(client);
         } else {
             return createNewClient(client);
@@ -84,15 +88,17 @@ public class ClientService {
     private ClientVO inactiveCpfHandler(Client entity, ClientVO client) {
         if (clientRepository.existsClientByEmail(client.getEmail())) {
             return validateExistingEmailForInactiveCpf(entity, client);
+        } else if (employeeRepository.existsEmployeeByEmail(client.getEmail())) {
+            throw new InvalidRequestException("ERROR: This E-mail is already registered!");
         } else {
             return activateAndUpdateClient(entity, client);
         }
     }
 
     private ClientVO validateExistingEmailForInactiveCpf(Client entity, ClientVO client) {
-        var entity2 = clientRepository.findByEmail(client.getEmail());
+        var checkClientEmail = clientRepository.findByEmail(client.getEmail());
 
-        if (entity.getId() != entity2.getId()) {
+        if (entity.getId() != checkClientEmail.getId() || employeeRepository.existsEmployeeByEmail(client.getEmail())) {
             throw new InvalidRequestException("ERROR: This E-mail is already registered!");
         } else {
             return activateAndUpdateClient(entity, client);
@@ -102,7 +108,9 @@ public class ClientService {
     private ClientVO validateInactiveExistingEmail(ClientVO client) {
         var entity = clientRepository.findByEmail(client.getEmail());
 
-        if (entity.getStatus() == ActiveStatus.INACTIVE) {
+        if(employeeRepository.existsEmployeeByEmail(client.getEmail())) {
+            throw new InvalidRequestException("ERROR: This E-mail is already registered!");
+        } else if (entity.getStatus() == ActiveStatus.INACTIVE) {
             return inactiveEmailHandler(entity, client);
         } else {
             throw new InvalidRequestException("ERROR: This E-mail is already registered!");
@@ -129,6 +137,7 @@ public class ClientService {
 
     private ClientVO activateAndUpdateClient(Client entity, ClientVO client) {
         entity.setStatus(ActiveStatus.ACTIVE);
+        entity.setPassword(client.getPassword());
         entity.setName(client.getName());
         entity.setCpf((client.getCpf()));
         entity.setEmail(client.getEmail());
@@ -143,6 +152,7 @@ public class ClientService {
     private ClientVO createNewClient(ClientVO client) {
         var entity = GatoPretoMapper.parseObject(client, Client.class);
         entity.setStatus(ActiveStatus.ACTIVE);
+        entity.setType(UserType.CLIENT);
 
         var vo = GatoPretoMapper.parseObject(clientRepository.save(entity), ClientVO.class);
         return vo;
@@ -163,6 +173,10 @@ public class ClientService {
 
         if (clientRepository.existsClientByEmail(client.getEmail())) {
             validateUniqueEmail(client, entity);
+        }
+
+        if (employeeRepository.existsEmployeeByEmail(client.getEmail())) {
+            throw new InvalidRequestException("ERROR: This E-mail is already registered!");
         }
     }
 

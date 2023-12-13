@@ -2,10 +2,12 @@ package br.com.adegagatopreto.services;
 
 import br.com.adegagatopreto.data.vo.v1.EmployeeVO;
 import br.com.adegagatopreto.enums.ActiveStatus;
+import br.com.adegagatopreto.enums.UserType;
 import br.com.adegagatopreto.exceptions.InvalidRequestException;
 import br.com.adegagatopreto.exceptions.ResourceNotFoundException;
 import br.com.adegagatopreto.mapper.GatoPretoMapper;
 import br.com.adegagatopreto.model.Employee;
+import br.com.adegagatopreto.repositories.ClientRepository;
 import br.com.adegagatopreto.repositories.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,8 @@ public class EmployeeService {
 
     @Autowired
     EmployeeRepository employeeRepository;
+    @Autowired
+    ClientRepository clientRepository;
 
     public List<EmployeeVO> findAll() {
         logger.info("Finding all Employees!");
@@ -41,13 +45,11 @@ public class EmployeeService {
     public EmployeeVO createEmployee(EmployeeVO employee) {
         logger.info("Creating an Employee!");
 
-        if (employeeRepository.existsEmployeeByUsername(employee.getUsername())) {
-            return validateInactiveExistingUsername(employee);
-        } else if (employeeRepository.existsEmployeeByCpf(employee.getCpf())) {
+        if (employeeRepository.existsEmployeeByCpf(employee.getCpf())) {
             return validateInactiveExistingCPF(employee);
-        } else if (employeeRepository.existsEmployeeByEmail(employee.getEmail())) {
+        } else if (employeeRepository.existsEmployeeByEmail(employee.getEmail()) || clientRepository.existsClientByEmail(employee.getEmail())) {
             return validateInactiveExistingEmail(employee);
-        } else {
+        }else {
             return createNewEmployee(employee);
         }
     }
@@ -86,10 +88,9 @@ public class EmployeeService {
     private EmployeeVO inactiveCpfHandler(Employee entity, EmployeeVO employee) {
         if (employeeRepository.existsEmployeeByEmail(employee.getEmail())) {
             return validateExistingEmailForInactiveCpf(entity, employee);
-        } else if(employeeRepository.existsEmployeeByUsername(employee.getUsername())) {
-            return validateExistingUsernameForInactiveCpf(entity, employee);
-        }
-        else {
+        } else if (clientRepository.existsClientByEmail(employee.getEmail())) {
+            throw new InvalidRequestException("ERROR: This E-mail is already registered!");
+        } else {
             return activateAndUpdateEmployee(entity, employee);
         }
     }
@@ -97,18 +98,8 @@ public class EmployeeService {
     private EmployeeVO validateExistingEmailForInactiveCpf(Employee entity, EmployeeVO employee) {
         var checkEmail = employeeRepository.findByEmail(employee.getEmail());
 
-        if (entity.getId() != checkEmail.getId()) {
+        if (entity.getId() != checkEmail.getId() || clientRepository.existsClientByEmail(employee.getEmail())) {
             throw new InvalidRequestException("ERROR: This E-mail is already registered!");
-        } else {
-            return activateAndUpdateEmployee(entity, employee);
-        }
-    }
-
-    private EmployeeVO validateExistingUsernameForInactiveCpf(Employee entity, EmployeeVO employee) {
-        var checkUsername = employeeRepository.findByUsername(employee.getUsername());
-
-        if (entity.getId() != checkUsername.getId()) {
-            throw new InvalidRequestException("ERROR: This Username is already registered!");
         } else {
             return activateAndUpdateEmployee(entity, employee);
         }
@@ -117,7 +108,9 @@ public class EmployeeService {
     private EmployeeVO validateInactiveExistingEmail(EmployeeVO employee) {
         var entity = employeeRepository.findByEmail(employee.getEmail());
 
-        if (entity.getStatus() == ActiveStatus.INACTIVE) {
+        if(clientRepository.existsClientByEmail(employee.getEmail())) {
+            throw new InvalidRequestException("ERROR: This E-mail is already registered!");
+        } else if (entity.getStatus() == ActiveStatus.INACTIVE) {
             return inactiveEmailHandler(entity, employee);
         } else {
             throw new InvalidRequestException("ERROR: This E-mail is already registered!");
@@ -127,8 +120,6 @@ public class EmployeeService {
     private EmployeeVO inactiveEmailHandler(Employee entity, EmployeeVO employee) {
         if (employeeRepository.existsEmployeeByCpf(employee.getCpf())) {
             return validateExistingCpfForInactiveEmail(entity, employee);
-        } else if(employeeRepository.existsEmployeeByUsername(employee.getUsername())) {
-            return validateExistingUsernameForInactiveCpf(entity, employee);
         } else {
             return activateAndUpdateEmployee(entity, employee);
         }
@@ -144,29 +135,8 @@ public class EmployeeService {
         }
     }
 
-    private EmployeeVO validateInactiveExistingUsername(EmployeeVO employee) {
-        var entity = employeeRepository.findByUsername(employee.getUsername());
-
-        if (entity.getStatus() == ActiveStatus.INACTIVE) {
-            return inactiveUsernameHandler(entity, employee);
-        } else {
-            throw new InvalidRequestException("ERROR: This Username is already registered!");
-        }
-    }
-
-    private EmployeeVO inactiveUsernameHandler(Employee entity, EmployeeVO employee) {
-        if (employeeRepository.existsEmployeeByCpf(employee.getCpf())) {
-            return validateExistingCpfForInactiveEmail(entity, employee);
-        } else if(employeeRepository.existsEmployeeByEmail(employee.getEmail())) {
-            return validateExistingEmailForInactiveCpf(entity, employee);
-        } else {
-            return activateAndUpdateEmployee(entity, employee);
-        }
-    }
-
     private EmployeeVO activateAndUpdateEmployee(Employee entity, EmployeeVO employee) {
         entity.setStatus(ActiveStatus.ACTIVE);
-        entity.setUsername(employee.getUsername());
         entity.setPassword(employee.getPassword());
         entity.setRole(employee.getRole());
         entity.setName(employee.getName());
@@ -182,6 +152,7 @@ public class EmployeeService {
     private EmployeeVO createNewEmployee(EmployeeVO employee) {
         var entity = GatoPretoMapper.parseObject(employee, Employee.class);
         entity.setStatus(ActiveStatus.ACTIVE);
+        entity.setType(UserType.EMPLOYEE);
 
         var vo = GatoPretoMapper.parseObject(employeeRepository.save(entity), EmployeeVO.class);
         return vo;
@@ -196,21 +167,14 @@ public class EmployeeService {
     }
 
     private void validateUniqueEmployee(EmployeeVO employee, Employee entity) {
-        if (employeeRepository.existsEmployeeByUsername(employee.getUsername())) {
-            validateUniqueUsername(employee, entity);
-        }
         if (employeeRepository.existsEmployeeByCpf(employee.getCpf())) {
             validateUniqueCpf(employee, entity);
         }
         if (employeeRepository.existsEmployeeByEmail(employee.getEmail())) {
             validateUniqueEmail(employee, entity);
         }
-    }
-
-    private void validateUniqueUsername(EmployeeVO employee, Employee entity) {
-        var checkUsername = employeeRepository.findByUsername(employee.getUsername());
-        if (!entity.getId().equals(checkUsername.getId())) {
-            throw new InvalidRequestException("ERROR: This Username is already registered!");
+        if (clientRepository.existsClientByEmail(employee.getEmail())) {
+            throw new InvalidRequestException("ERROR: This E-mail is already registered!");
         }
     }
 
