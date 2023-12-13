@@ -26,13 +26,7 @@ public interface EmployeeRepository extends JpaRepository <Employee, Long> {
     @Query(value = "SELECT * FROM adega_gato_preto.employee WHERE employee.email = ? AND employee.status = 'ACTIVE'", nativeQuery = true)
     Employee findByEmailActive(String cpf);
 
-    @Query(value = "SELECT * FROM adega_gato_preto.employee WHERE employee.username = ?", nativeQuery = true)
-    Employee findByUsername(String cpf);
-    @Query(value = "SELECT * FROM adega_gato_preto.employee WHERE employee.username = ? AND employee.status = 'ACTIVE'", nativeQuery = true)
-    Employee findByUsernameActive(String cpf);
-
     boolean existsEmployeeById(Long id);
     boolean existsEmployeeByCpf(String cpf);
     boolean existsEmployeeByEmail(String email);
-    boolean existsEmployeeByUsername(String username);
 }

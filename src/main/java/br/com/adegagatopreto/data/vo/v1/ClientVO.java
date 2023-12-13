@@ -1,12 +1,13 @@
 package br.com.adegagatopreto.data.vo.v1;
 
 import br.com.adegagatopreto.enums.ActiveStatus;
+import br.com.adegagatopreto.enums.UserType;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
 import java.util.Objects;
 
-public class ClientVO implements Serializable {
+public class ClientVO extends UserVO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -17,8 +18,6 @@ public class ClientVO implements Serializable {
 
     private String cpf;
 
-    private String email;
-
     private String phone;
 
     private String cep;
@@ -28,12 +27,12 @@ public class ClientVO implements Serializable {
     public ClientVO() {
     }
 
-    public ClientVO(Long id, ActiveStatus status, String name, String cpf, String email, String phone, String cep, String address) {
+    public ClientVO(String email, String password, UserType type, Long id, ActiveStatus status, String name, String cpf, String phone, String cep, String address) {
+        super(email, password, type);
         this.id = id;
         this.status = status;
         this.name = name;
         this.cpf = cpf;
-        this.email = email;
         this.phone = phone;
         this.cep = cep;
         this.address = address;
@@ -71,14 +70,6 @@ public class ClientVO implements Serializable {
         this.cpf = cpf;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public String getPhone() {
         return phone;
     }
@@ -107,11 +98,12 @@ public class ClientVO implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ClientVO clientVO)) return false;
-        return Objects.equals(getId(), clientVO.getId()) && getStatus() == clientVO.getStatus() && Objects.equals(getName(), clientVO.getName()) && Objects.equals(getCpf(), clientVO.getCpf()) && Objects.equals(getEmail(), clientVO.getEmail()) && Objects.equals(getPhone(), clientVO.getPhone()) && Objects.equals(getCep(), clientVO.getCep()) && Objects.equals(getAddress(), clientVO.getAddress());
+        if (!super.equals(o)) return false;
+        return Objects.equals(getId(), clientVO.getId()) && getStatus() == clientVO.getStatus() && Objects.equals(getName(), clientVO.getName()) && Objects.equals(getCpf(), clientVO.getCpf()) && Objects.equals(getPhone(), clientVO.getPhone()) && Objects.equals(getCep(), clientVO.getCep()) && Objects.equals(getAddress(), clientVO.getAddress());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getStatus(), getName(), getCpf(), getEmail(), getPhone(), getCep(), getAddress());
+        return Objects.hash(super.hashCode(), getId(), getStatus(), getName(), getCpf(), getPhone(), getCep(), getAddress());
     }
 }
