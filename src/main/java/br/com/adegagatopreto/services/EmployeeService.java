@@ -10,6 +10,7 @@ import br.com.adegagatopreto.model.Employee;
 import br.com.adegagatopreto.repositories.ClientRepository;
 import br.com.adegagatopreto.repositories.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -136,8 +137,9 @@ public class EmployeeService {
     }
 
     private EmployeeVO activateAndUpdateEmployee(Employee entity, EmployeeVO employee) {
+        BCryptPasswordEncoder bCrypt = new BCryptPasswordEncoder();
         entity.setStatus(ActiveStatus.ACTIVE);
-        entity.setPassword(employee.getPassword());
+        entity.setPassword(bCrypt.encode(employee.getPassword()));
         entity.setRole(employee.getRole());
         entity.setName(employee.getName());
         entity.setCpf(employee.getCpf());
@@ -151,8 +153,10 @@ public class EmployeeService {
 
     private EmployeeVO createNewEmployee(EmployeeVO employee) {
         var entity = GatoPretoMapper.parseObject(employee, Employee.class);
+        BCryptPasswordEncoder bCrypt = new BCryptPasswordEncoder();
         entity.setStatus(ActiveStatus.ACTIVE);
         entity.setType(UserType.EMPLOYEE);
+        entity.setPassword(bCrypt.encode(employee.getPassword()));
 
         var vo = GatoPretoMapper.parseObject(employeeRepository.save(entity), EmployeeVO.class);
         return vo;
