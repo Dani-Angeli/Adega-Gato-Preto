@@ -10,6 +10,7 @@ import br.com.adegagatopreto.model.Client;
 import br.com.adegagatopreto.repositories.ClientRepository;
 import br.com.adegagatopreto.repositories.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -136,8 +137,9 @@ public class ClientService {
     }
 
     private ClientVO activateAndUpdateClient(Client entity, ClientVO client) {
+        BCryptPasswordEncoder bCrypt = new BCryptPasswordEncoder();
         entity.setStatus(ActiveStatus.ACTIVE);
-        entity.setPassword(client.getPassword());
+        entity.setPassword(bCrypt.encode(client.getPassword()));
         entity.setName(client.getName());
         entity.setCpf((client.getCpf()));
         entity.setEmail(client.getEmail());
@@ -151,8 +153,10 @@ public class ClientService {
 
     private ClientVO createNewClient(ClientVO client) {
         var entity = GatoPretoMapper.parseObject(client, Client.class);
+        BCryptPasswordEncoder bCrypt = new BCryptPasswordEncoder();
         entity.setStatus(ActiveStatus.ACTIVE);
         entity.setType(UserType.CLIENT);
+        entity.setPassword(bCrypt.encode(client.getPassword()));
 
         var vo = GatoPretoMapper.parseObject(clientRepository.save(entity), ClientVO.class);
         return vo;
