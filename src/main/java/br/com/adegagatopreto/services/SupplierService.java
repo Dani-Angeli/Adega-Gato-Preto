@@ -40,6 +40,15 @@ public class SupplierService {
         }
     }
 
+    public List<SupplierVO> searchSupplier(String keyword) {
+        List<Supplier> searchList = supplierRepository.searchSupplier(keyword);
+        if (!searchList.isEmpty()) {
+            return GatoPretoMapper.parseListObjects(searchList, SupplierVO.class);
+        } else {
+            throw new ResourceNotFoundException("ERROR: No records found for this Supplier!");
+        }
+    }
+
     public SupplierVO createSupplier(SupplierVO supplier) {
         logger.info("Creating a Supplier!");
 
