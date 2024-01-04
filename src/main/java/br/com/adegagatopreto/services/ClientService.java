@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -30,6 +31,15 @@ public class ClientService {
         logger.info("Finding all Clients!");
 
         return GatoPretoMapper.parseListObjects(clientRepository.findAllActive(), ClientVO.class);
+    }
+
+    public List<ClientVO> searchClients(String keyword) {
+        List<Client> searchList = clientRepository.searchClient(keyword);
+        if (!searchList.isEmpty()) {
+            return GatoPretoMapper.parseListObjects(searchList, ClientVO.class);
+        } else {
+            throw new ResourceNotFoundException("ERROR: No records found for this ID!");
+        }
     }
 
     public ClientVO findById(Long id) {

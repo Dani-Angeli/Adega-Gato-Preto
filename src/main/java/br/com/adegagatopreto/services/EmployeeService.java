@@ -1,11 +1,13 @@
 package br.com.adegagatopreto.services;
 
+import br.com.adegagatopreto.data.vo.v1.ClientVO;
 import br.com.adegagatopreto.data.vo.v1.EmployeeVO;
 import br.com.adegagatopreto.enums.ActiveStatus;
 import br.com.adegagatopreto.enums.UserType;
 import br.com.adegagatopreto.exceptions.InvalidRequestException;
 import br.com.adegagatopreto.exceptions.ResourceNotFoundException;
 import br.com.adegagatopreto.mapper.GatoPretoMapper;
+import br.com.adegagatopreto.model.Client;
 import br.com.adegagatopreto.model.Employee;
 import br.com.adegagatopreto.repositories.ClientRepository;
 import br.com.adegagatopreto.repositories.EmployeeRepository;
@@ -40,6 +42,15 @@ public class EmployeeService {
             return GatoPretoMapper.parseObject(entity, EmployeeVO.class);
         } catch (Exception e) {
             throw new ResourceNotFoundException("ERROR: No records found for this ID!");
+        }
+    }
+
+    public List<EmployeeVO> searchEmployee(String keyword) {
+        List<Employee> searchList = employeeRepository.searchClient(keyword);
+        if (!searchList.isEmpty()) {
+            return GatoPretoMapper.parseListObjects(searchList, EmployeeVO.class);
+        } else {
+            throw new ResourceNotFoundException("ERROR: No records found for this Employee!");
         }
     }
 

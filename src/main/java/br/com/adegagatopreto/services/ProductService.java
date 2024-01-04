@@ -39,6 +39,15 @@ public class ProductService {
         }
     }
 
+    public List<ProductVO> searchProduct(String keyword) {
+        List<Product> searchList = productRepository.searchProduct(keyword);
+        if (!searchList.isEmpty()) {
+            return GatoPretoMapper.parseListObjects(searchList, ProductVO.class);
+        } else {
+            throw new ResourceNotFoundException("ERROR: No records found for this Product!");
+        }
+    }
+
     public ProductVO createProduct(ProductVO product) {
         logger.info("Creating a Client!");
 

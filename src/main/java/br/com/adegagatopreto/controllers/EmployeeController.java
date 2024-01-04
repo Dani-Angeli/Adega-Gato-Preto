@@ -1,5 +1,6 @@
 package br.com.adegagatopreto.controllers;
 
+import br.com.adegagatopreto.data.vo.v1.ClientVO;
 import br.com.adegagatopreto.data.vo.v1.EmployeeVO;
 import br.com.adegagatopreto.services.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,11 @@ public class EmployeeController {
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public EmployeeVO findById(@PathVariable(value = "id") Long id) {
         return employeeService.findById(id);
+    }
+
+    @GetMapping("/search")
+    public List<EmployeeVO> searchEmployee(@RequestParam String keyword) {
+        return employeeService.searchEmployee(keyword);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)

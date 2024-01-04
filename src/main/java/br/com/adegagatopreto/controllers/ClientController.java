@@ -21,6 +21,11 @@ public class ClientController {
         return clientService.findAll();
     }
 
+    @GetMapping("/search")
+    public List<ClientVO> searchClients(@RequestParam String keyword) {
+        return clientService.searchClients(keyword);
+    }
+
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ClientVO findById(@PathVariable(value = "id") Long id) {
         return clientService.findById(id);
